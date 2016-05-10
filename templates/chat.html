@@ -1,0 +1,19 @@
+<div class="chat-messages">
+    <div class="list-group">
+        {% for message in chat_messages %}
+            <a href="#" class="list-group-item">
+                <p class="{% if message.from_user == request.user %}text-right{% else %}text-left{% endif %}">
+                    {% if message.from_user == request.user %}
+                        You
+                    {% else %}
+                        {{ message.from_user.email }} {{ message.from_user.email }}
+                    {% endif %} at
+                    <span class="message-datetime">{{ message.datetime }}</span>
+                </p>
+                <p class="chat-message list-group-item-text {% if message.from_user == request.user %}text-right{% else %}text-left{% endif %}">{{ message.message }}</p>
+            </a>
+        {% empty %}
+            There are no messages yet!
+        {% endfor %}
+    </div>
+</div>

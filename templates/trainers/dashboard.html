@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}Trainer Dashboard{% endblock %}
+
+
+{% block body %}
+    <div class="container">
+        <div class="row" style="margin-top: 10px;height: 55px">
+            <div class="col-md-11" id="messages">
+                {% if messages %}
+                    <div class="row text-center">
+                        <div class="col-sm-offset-4 col-sm-4 disable-horizontal-padding">
+                            <div class="alert alert-success" role="alert">
+                                <button type="button" class="close" data-dismiss="alert">×</button>
+                                <strong>Well done!</strong> {% for message in messages %}{{ message }}{% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-1"><a class="btn btn-primary" href="{% url 'logout-view' %}">Logout</a></div>
+        </div>
+        <div class="row" style="margin-top: 10px">
+            <div class="col-md-2">
+                <img src="{% static 'images/blank-profile-picture.png' %}" width="160">
+            </div>
+            <div class="col-md-3">
+                <p>Trainer: {{ request.user.first_name }} {{ request.user.last_name }}</p>
+                <p>Date joined: {{ request.user.date_joined }}</p>
+            </div>
+            <div class="col-md-6">
+                <form action="" method="post" class="form-row">
+                    <h4>Add workout:</h4>
+                    {% csrf_token %}
+                    <fieldset class="form-group form-group-sm">
+                        <label for="client">Client:</label>
+                        <select name="client" id="client" class="form-control">
+                            {% for client in clients %}
+                                <option value="{{ client.id }}">{{ client.user.email }}</option>
+                            {% endfor %}
+                        </select>
+                    </fieldset>
+                    <fieldset class="form-group form-group-sm">
+                        <label for="start_date">Start date:</label>
+                        <input type="date"
+                               class="form-control"
+                               id="start_date"
+                               name="start_date"
+                               placeholder="Date"
+                               value="{{ form.start_date.value|default_if_none:'' }}">
+                        {% if form.start_date.errors %}
+                            <span class="help-block text-danger no-margin">{{ form.start_date.errors.0 }}</span>
+                        {% endif %}
+                    </fieldset>
+                    <fieldset class="form-group form-group-sm">
+                        <label for="duration">Duration (days)</label>
+                        <input type="number"
+                               step="1"
+                               class="form-control"
+                               id="duration"
+                               name="duration"
+                               placeholder="Duration"
+                               value="{{ form.duration.value|default_if_none:1 }}">
+                        {% if form.duration.errors %}
+                            <span class="help-block text-danger no-margin">{{ form.duration.errors.0 }}</span>
+                        {% endif %}
+                    </fieldset>
+                    <fieldset class="form-group form-group-sm">
+                            <label for="Description">Description</label>
+                            <textarea
+                                   class="form-control"
+                                   id="description"
+                                   name="description"
+                                   placeholder="Workout description">{{ form.description.value|default_if_none:'' }}</textarea>
+                            {% if form.description.errors %}
+                                <span class="help-block text-danger no-margin">{{ form.description.errors.0 }}</span>
+                            {% endif %}
+                        </fieldset>
+                    <fieldset class="form-group no-margin">
+                        <input type="submit" class="btn btn-primary btn-sm btn-block" value="Add workout"/>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <input type="hidden" value="{{ request.GET.cu }}" id="active-chat-client-id" />
+            <div class="col-md-3">
+                <h4>Clients</h4>
+                <div class="list-group" id="clients-chat-list">
+                    {% for client in  clients %}
+                        <a href="#" class="list-group-item" data-user-id="{{ client.user.id }}">{{ client.user.email }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div id="chat-container">
+                    <div id="chat">
+
+                    </div>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <label for="message">Send message to your trainer:</label>
+                        <textarea class="form-control" rows="1" name="message" id="message"
+                                  placeholder="Enter message here..."></textarea>
+                        <input type="submit" value="Send message" class="btn btn-default btn-block" id="send-message"
+                               style="margin-top: 10px">
+                        <input type="hidden" value="{% url 'send-trainer-message' %}" id="send-message-url">
+                        <p class="help-block text-danger" id="message-error"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

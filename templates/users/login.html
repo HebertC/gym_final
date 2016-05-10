@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-offset-4 col-sm-4">
+                <h2 class="text-center">LOGIN FORM</h2>
+                <form class="form-horizontal" role="form" method="post">
+                    {% csrf_token %}
+                    <fieldset class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text"
+                               class="form-control"
+                               id="email"
+                               name="email"
+                               placeholder="Email"
+                               value="{{ form.email.value|default_if_none:'' }}">
+                        {% if form.email.errors %}
+                            <span class="help-block text-danger">{{ form.email.errors.0 }}</span>
+                        {% endif %}
+                    </fieldset>
+                    <fieldset class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password"
+                               class="form-control"
+                               id="password"
+                               name="password"
+                               placeholder="Password"
+                               value="{{ form.password.value|default_if_none:'' }}">
+                        {% if form.password.errors %}
+                            <span class="help-block text-danger">{{ form.password.errors.0 }}</span>
+                        {% endif %}
+                    </fieldset>
+                    <fieldset class="form-group">
+                        <input type="submit" class="btn btn-primary btn-block" value="Login"/>
+                    </fieldset>
+                    <fieldset class="form-group">
+                        <a class="btn btn-success btn-block" href="{% url 'registration-view' %}">Register</a>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
+        {% if messages %}
+            <div class="row text-center">
+                <div class="col-sm-offset-4 col-sm-4 disable-horizontal-padding">
+                    <div class="alert alert-success" role="alert">
+                        <strong>Well done!</strong> {% for message in messages %}{{ message }}{% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

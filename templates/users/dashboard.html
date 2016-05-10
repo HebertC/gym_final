@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}Dashboard{% endblock %}
+
+
+{% block body %}
+    <div class="container">
+        <div class="row" style="margin-top: 10px;height: 55px">
+            <div class="col-md-11" id="messages">
+                {% if messages %}
+                    <div class="row text-center">
+                        <div class="col-sm-offset-4 col-sm-4 disable-horizontal-padding">
+                            <div class="alert alert-success" role="alert">
+                                <button type="button" class="close" data-dismiss="alert">×</button>
+                                <strong>Well done!</strong> {% for message in messages %}{{ message }}{% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-1"><a class="btn btn-primary" href="{% url 'logout-view' %}">Logout</a></div>
+        </div>
+        <div class="row" style="margin-top: 10px">
+            <div class="col-md-2">
+                <img src="{% static 'images/blank-profile-picture.png' %}" width="160">
+            </div>
+            <div class="col-md-3">
+                <p>Email: {{ request.user.email }}</p>
+                <p>Date joined: {{ request.user.date_joined }}</p>
+            </div>
+            <div class="col-md-2">
+                <p>What is your weight today?</p>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <fieldset class="form-group form-group-sm no-margin">
+                        <label for="date">Date</label>
+                        <input type="date"
+                               class="form-control"
+                               id="date"
+                               name="date"
+                               placeholder="Date"
+                               value="{{ form.date.value|default_if_none:'' }}">
+                        {% if form.date.errors %}
+                            <span class="help-block text-danger no-margin">{{ form.date.errors.0 }}</span>
+                        {% endif %}
+                    </fieldset>
+                    <fieldset class="form-group form-group-sm">
+                        <label for="weight">Weight</label>
+                        <input type="number"
+                               step="0.01"
+                               class="form-control"
+                               id="weight"
+                               name="weight"
+                               placeholder="Weight"
+                               value="{{ form.weight.value|default_if_none:'' }}">
+                        {% if form.weight.errors %}
+                            <span class="help-block text-danger no-margin">{{ form.weight.errors.0 }}</span>
+                        {% endif %}
+                    </fieldset>
+                    <fieldset class="form-group no-margin">
+                        <input type="submit" class="btn btn-primary btn-sm btn-block" value="Record your weight"/>
+                    </fieldset>
+                </form>
+            </div>
+
+            <div class="col-md-3" style="max-height: 200px; overflow: visible;">
+                <div class="chat-container">
+                    <div class="chat-messages">
+                        <div class="list-group">
+                            {% for message in chat_messages %}
+                                <a href="#" class="list-group-item">
+                                    <p class="{% if message.from_user == request.user %}text-right{% else %}text-left{% endif %}">
+                                        {% if message.from_user == request.user %}
+                                            You
+                                        {% else %}
+                                            {{ message.from_user.first_name }} {{ message.from_user.last_name }}
+                                        {% endif %} at
+                                        <span class="message-datetime">{{ message.datetime }}</span>
+                                    </p>
+                                    <p class="chat-message list-group-item-text {% if message.from_user == request.user %}text-right{% else %}text-left{% endif %}">{{ message.message }}</p>
+                                </a>
+                            {% empty %}
+                                There are no messages yet!
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <label for="message">Send message to your trainer:</label>
+                        <textarea class="form-control" rows="1" name="message" id="message"
+                                  placeholder="Enter message here..."></textarea>
+                        <input type="submit" value="Send message" class="btn btn-default btn-block" id="send-message"
+                               style="margin-top: 10px">
+                        <input type="hidden" value="{% url 'send-trainer-message' %}" id="send-message-url">
+                        <p class="help-block text-danger" id="message-error"></p>
+                    </form>
+                </div>
+
+            <div class="col-md-3">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <label for="message">Send message to your trainer:</label>
+                    <textarea class="form-control" rows="3" name="message" id="message" placeholder="Enter message here..."></textarea>
+                    <input type="submit" value="Send message" class="btn btn-default btn-block" id="send-message" style="margin-top: 10px">
+                    <input type="hidden" value="{% url 'send-trainer-message' %}" id="send-message-url">
+                    <p class="help-block">Total messages sent: <span id="total-messages">{{ messages_count }}</span></p>
+                    <p class="help-block text-danger" id="message-error"></p>
+                </form>
+
+            </div>
+        </div>
+        <div class="row" style="margin-top: 10px;">
+            {% if weight_records %}
+                <div class="col-md-7">
+                    <h4>Your weight records.</h4>
+                    <table class="table table-responsive table-bordered">
+                        <tr>
+                            <th>Date</th>
+                            <th>Weight</th>
+                        </tr>
+                        {% for record in weight_records %}
+                            <tr>
+                                <td>{{ record.date }}</td>
+                                <td>{{ record.weight }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    {% if weight_records.paginator.num_pages > 1 %}
+                        <ul class="pagination pagination-sm">
+                            {% if weight_records.has_previous %}
+                                <li><a href="?page={{ weight_records.previous_page_number }}">&laquo;</a></li>
+                            {% else %}
+                                <li class="disabled"><a href="#">&laquo;</a></li>
+                            {% endif %}
+
+                            <li class="active"><a href="#">Page {{ weight_records.number }} of {{ weight_records.paginator.num_pages }}</a></li>
+
+                            {% if weight_records.has_next %}
+                                <li><a href="?page={{ weight_records.next_page_number }}">&raquo;</a></li>
+                            {% else %}
+                                <li class="disabled"><a href="#">&raquo;</a></li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="col-md-7 text-center"><h4>You have no weight records yet.</h4></div>
+            {% endif %}
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+            {% if workouts %}
+                <div class="col-md-7">
+                    <h4>Your workouts.</h4>
+                    <table class="table table-responsive table-bordered">
+                        <tr>
+                            <th>Trainer</th>
+                            <th>Start date</th>
+                            <th>Duration (days)</th>
+                            <th>Description</th>
+                        </tr>
+                        {% for record in workouts %}
+                            <tr>
+                                <td>{{ record.trainer }}</td>
+                                <td>{{ record.start_date }}</td>
+                                <td>{{ record.duration }}</td>
+                                <td>{{ record.description }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            {% else %}
+                There are not workouts yet.
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Registration{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-3 col-md-6">
+                <h2 class="text-center">REGISTER</h2>
+                <form class="form-horizontal" action="" method="POST">
+                    {% csrf_token %}
+                    <fieldset>
+                        <div class="control-group">
+                            <label class="control-label" for="email">E-mail</label>
+                            <div class="controls">
+                                <input type="email" id="email" name="email" placeholder="" class="form-control" value="{{ form.email.value|default_if_none:'' }}">
+                                {% if form.email.errors %}
+                                    <span class="help-block text-danger">{{ form.email.errors.0 }}</span>
+                                {% else %}
+                                    <p class="help-block">Please provide your E-mail</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="password">Password</label>
+                            <div class="controls">
+                                <input type="password" id="password" name="password" placeholder="" class="form-control" value="{{ form.password.value|default_if_none:'' }}">
+                                {% if form.password.errors %}
+                                    <span class="help-block text-danger">{{ form.password.errors.0 }}</span>
+                                {% else %}
+                                    <p class="help-block">Password should be at least 5 characters</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="password2">Password (Confirm)</label>
+                            <div class="controls">
+                                <input type="password" id="password_confirm" name="password2" placeholder="" class="form-control">
+                                {% if form.password2.errors %}
+                                    <span class="help-block text-danger">{{ form.password2.errors.0 }}</span>
+                                {% else %}
+                                    <p class="help-block">Please confirm password</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <!-- Button -->
+                            <div class="controls">
+                                <input class="btn btn-primary btn-block" value="Register" type="submit">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <!-- Button -->
+                            <div class="controls" style="margin-top: 10px">
+                                <a class="btn btn-primary btn-block btn-success" href="{% url 'login-view' %}">Login</a>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
